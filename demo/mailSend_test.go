@@ -3,11 +3,12 @@ package demo
 import (
 	"fmt"
 	"gopkg.in/gomail.v2"
+	"testing"
 )
 
 //邮件发送
 //doc https://github.com/go-gomail/gomail
-func SendMail() {
+func Test_SendMail(t *testing.T) {
 	sender := "sned@dsds.com"
 	senderNickName := "wangjia"
 	senderPw := "password"

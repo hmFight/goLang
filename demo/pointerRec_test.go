@@ -3,6 +3,7 @@ package demo
 import (
 	"fmt"
 	"math"
+	"testing"
 )
 
 type Vertex struct {
@@ -24,16 +25,16 @@ func (v *Vertex) Distance() float64 {
 }
 
 // 指针 receiver
-func PointerMethod() {
-	v := &Vertex{3.0, 4.0}
-	fmt.Println("Original: ", v, v.Distance())
+func TestPointerMethod(t *testing.T) {
+	v := Vertex{3.0, 4.0}
+	fmt.Println(" Original: ", v, v.Distance())
 	fmt.Println("----------------------------")
 
 	v.Belarger1(5.0)
-	fmt.Println("After no pointer method: ", v, v.Distance())
+	fmt.Println(" no pointer method: ", v, v.Distance())
 	fmt.Println("----------------------------")
 
 	v.Belarger(5.0)
-	fmt.Println("After pointer method: ", v, v.Distance())
+	fmt.Println(" pointer method: ", v, v.Distance())
 	fmt.Println("----------------------------")
 }
