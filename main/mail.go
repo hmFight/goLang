@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/hmFight/demo"
+	"fmt"
 )
 
 // doc https://godoc.org/gopkg.in/gomail.v2#example-package
 func main() {
-	demo.SendMail()
+	fmt.Print("Hello Go!")
 }

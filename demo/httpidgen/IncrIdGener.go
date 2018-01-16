@@ -4,6 +4,6 @@ import "sync"
 
 type IncrIdGene struct {
 	step int
-	id   int64
+	id   int
 	lock *sync.RWMutex
 }
