@@ -49,5 +49,5 @@ func (this *SnowflakeIdGen) GetId() uint64 {
 	this.lock.RLock()
 	newId := ((this.timeStamp - baseTimestamp) << timestampLeftShift) | (this.DataCenterId << dataCenterIdShift) | (this.MechineId << workIdShift) | uint64(seq)
 	this.lock.RUnlock()
-	return uint64(newId)
+	return newId
 }
