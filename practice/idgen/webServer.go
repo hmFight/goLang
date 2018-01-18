@@ -12,7 +12,7 @@ func IdWebServer() {
 
 	http.HandleFunc("/id/snowflake", snowflake)
 	http.HandleFunc("/id/incr", incr)
-
+	fmt.Println("start listen:127.0.0.1:8080")
 	err := http.ListenAndServe("127.0.0.1:8080", nil)
 
 	if err != nil {
