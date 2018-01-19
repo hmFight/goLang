@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
+	"github.com/hmfight/practice/idgen"
 )
 
 // doc https://godoc.org/gopkg.in/gomail.v2#example-package
 func main() {
-	fmt.Print("Hello Go!")
+	idgen.IdWebServer()
 }

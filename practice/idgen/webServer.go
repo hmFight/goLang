@@ -1,19 +1,51 @@
 package idgen
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 )
 
-var snowflakeIdGen SnowflakeIdGen = NewIdGenerator(1, 1)
-var incrIdGen AutoIncrIdGen = NewAutoIncrIdGen()
+var help bool
+var port int
+var version bool
+var apis string
+var snowflakeIdGen = NewIdGenerator(1, 1)
+var incrIdGen = NewAutoIncrIdGen()
+
+func init() {
+	flag.BoolVar(&version, "v", false, "version")
+	flag.BoolVar(&help, "help", false, "this help")
+	flag.IntVar(&port, "port", 7888, "server port,default 7888")
+
+	flag.StringVar(&apis, "apis", "",
+		`/id/snowflake
+	/id/incr`)
+
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, `hi,all you guys!
+`)
+		flag.PrintDefaults()
+	}
+}
 
 func IdWebServer() {
-
+	flag.Parse()
+	if help {
+		flag.Usage()
+		return
+	}
+	if version {
+		fmt.Println("version:0.1.1")
+		return
+	}
 	http.HandleFunc("/id/snowflake", snowflake)
 	http.HandleFunc("/id/incr", incr)
-	fmt.Println("start listen:127.0.0.1:8080")
-	err := http.ListenAndServe("127.0.0.1:8080", nil)
+	listenTo := "127.0.0.1:" + strconv.Itoa(port)
+	fmt.Println("start listen:" + listenTo)
+	err := http.ListenAndServe(listenTo, nil)
 
 	if err != nil {
 		fmt.Println("ListenAndServe error: ", err.Error())
