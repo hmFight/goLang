@@ -44,7 +44,10 @@ func IdWebServer() {
 	http.HandleFunc("/id/snowflake", snowflake)
 	http.HandleFunc("/id/incr", incr)
 	listenTo := "127.0.0.1:" + strconv.Itoa(port)
-	fmt.Println("start listen:" + listenTo)
+	fmt.Println("listen:" + listenTo)
+	fmt.Println("api:")
+	fmt.Println("    /id/snowflake")
+	fmt.Println("    /id/incr")
 	err := http.ListenAndServe(listenTo, nil)
 
 	if err != nil {
