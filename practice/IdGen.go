@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	idgen.IdWebServer()
+	idgen.StartIdServer()
 }

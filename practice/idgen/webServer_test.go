@@ -3,5 +3,5 @@ package idgen
 import "testing"
 
 func TestWebServer(t *testing.T) {
-	IdWebServer()
+	IdWebServer("7888")
 }
