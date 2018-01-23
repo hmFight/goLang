@@ -44,5 +44,5 @@ func StartIdServer() {
 	fmt.Println("    /id/snowflake")
 	fmt.Println("    /id/incr")
 
-	IdWebServer(listenTo)
+	//IdWebServer(listenTo)
 }
