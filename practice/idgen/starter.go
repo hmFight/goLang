@@ -35,8 +35,10 @@ func StartIdServer() {
 				"    --get id by snowfalke\n" +
 				"/id/incr[?key=your_key]\n" +
 				"    --get id by auto-incrementor,every key map a IdGenerator\n" +
+				"/id/incr/resetall\n" +
+				"    --reset all AutoIdGenerator to 0\n" +
 				"/id/incr/reset[?key=your_key]\n" +
-				"    --reset all auto-incrementor [or IdGenerator of your_key ] to 0")
+				"    --reset the IdGenerator of your_key to 0")
 		return
 	}
 	listenTo := ":" + strconv.Itoa(port)
