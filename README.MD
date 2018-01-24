@@ -5,24 +5,38 @@
  ```
 --practice
   	--ext    extra说明
-  	--idgen  go练习项目：id生成器
+  	--idgen  go练习项目：http id 生成器
  ```
 
-使用
+### Id 生成器
+
+#### Feature
+
+*  Snowfalke ID ✔️
+* 自增 Id 生成✔️
+* 批量获取 
+* Id 重置✔️
+
+#### Http Api
 
 ```shell
-➜ ./IdGenerator -h                
-hi,all you guys!
-  -apis string
-        /id/snowflake
-        /id/incr
-  -help
-        this help
-  -port int
-        server port,default 7888 (default 7888)
-  -v    version
-  
-➜ ./IdGenerator -port=8080 &     
- 
+//从 snowflake id生成器获取id
+curl http://host/id/snowflake   
+
+//从 指定 key 的自增id生成器获取id,如果不指定 key,则从默认 key 为 default
+curl -G [-d 'key=val'] http://host/id/incr
+
+//重置所有自增 id 生成器 当前 id 为 0
+curl http://host/id/incr/resetall
+
+//重置指定 key 自增 id 生成器 当前 id 为 0
+curl -G [-d 'key=val'] http://host/id/incr/reset
+
+//重置指定 key 自增 id 生成器 当前 id 为 数值 num ，待增加
+curl -G [-d 'key=val&to=tar_id'] http://host/id/incr/reset
+
+//待完善
+//批量获取 id
+curl -G [-d 'key=val&num=id_num'] http://host/id/incr/reset
 ```
 

@@ -26,7 +26,7 @@ func init() {
 func StartIdServer() {
 	flag.Parse()
 	if version {
-		fmt.Println("version:0.1.1")
+		fmt.Println("version:0.5.1")
 		return
 	}
 	if apis {
