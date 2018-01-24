@@ -3,45 +3,44 @@ package idgen
 import (
 	"flag"
 	"fmt"
-	"os"
 	"strconv"
 )
 
-var help bool
 var port int
 var version bool
-var apis string
+var apis bool
 
 func init() {
-	flag.BoolVar(&version, "v", false, "version")
+	flag.BoolVar(&version, "v", false, "show version")
 	flag.IntVar(&port, "port", 7888, "server port,default 7888")
 
-	flag.StringVar(&apis, "apis", "",
-		`/id/snowflake
-	/id/incr`)
+	flag.BoolVar(&apis, "apis", false, "how to use")
 
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stdout, `hi,all you guys!
-`)
-		flag.PrintDefaults()
-	}
+	//	flag.Usage = func() {
+	//		fmt.Fprintf(os.Stdout, `hi,all you guys!
+	//`)
+	//		flag.PrintDefaults()
+	//	}
 }
 
 func StartIdServer() {
 	flag.Parse()
-	if help {
-		flag.Usage()
-		return
-	}
 	if version {
 		fmt.Println("version:0.1.1")
 		return
 	}
+	if apis {
+		fmt.Println(
+			"/id/snowflake\n" +
+				"    --get id by snowfalke\n" +
+				"/id/incr[?key=your_key]\n" +
+				"    --get id by auto-incrementor,every key map a IdGenerator\n" +
+				"/id/incr/reset[?key=your_key]\n" +
+				"    --reset all auto-incrementor [or IdGenerator of your_key ] to 0")
+		return
+	}
 	listenTo := ":" + strconv.Itoa(port)
-	fmt.Println("listen:" + listenTo)
-	fmt.Println("api:")
-	fmt.Println("    /id/snowflake")
-	fmt.Println("    /id/incr")
+	fmt.Println("listen" + listenTo)
 
 	IdWebServer(listenTo)
 }

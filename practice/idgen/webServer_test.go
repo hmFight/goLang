@@ -12,6 +12,10 @@ func TestWebServerId(a *testing.T) {
 	IdWebServer(":7888")
 }
 
+func TestStartIdServer(a *testing.T) {
+	StartIdServer()
+}
+
 func TestWebServer(t *testing.T) {
 	defaultKeyIdUrl := "http://localhost:7888/id/incr"
 	spKeyUrl := "http://localhost:7888/id/incr?key=key1"
