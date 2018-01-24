@@ -20,7 +20,7 @@ func TestWebServer(t *testing.T) {
 	defaultKeyIdUrl := "http://localhost:7888/id/incr"
 	spKeyUrl := "http://localhost:7888/id/incr?key=key1"
 
-	resetResult := httpGetBodyStr("http://localhost:7888/id/incr/reset")
+	resetResult := httpGetBodyStr("http://localhost:7888/id/incr/resetall")
 	testHelper(t, "ok", resetResult, "resetResult")
 
 	for defaultKeyId, i := "", 1; i <= 100; i++ {
@@ -33,8 +33,14 @@ func TestWebServer(t *testing.T) {
 		testHelper(t, strconv.Itoa(i), spkeyId, "spkeyId")
 	}
 
-	resetResult = httpGetBodyStr("http://localhost:7888/id/incr/reset")
+	//test reset
+	resetResult = httpGetBodyStr("http://localhost:7888/id/incr/reset?key=key1")
 	testHelper(t, "ok", resetResult, "resetResult")
+
+	for spkeyId, i := "", 1; i <= 1000; i++ {
+		spkeyId = httpGetBodyStr(spKeyUrl)
+		testHelper(t, strconv.Itoa(i), spkeyId, "spkeyId")
+	}
 
 }
 

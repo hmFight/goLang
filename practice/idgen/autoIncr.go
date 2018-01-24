@@ -16,6 +16,12 @@ func (this *AutoIncrIdGen) GetId() uint64 {
 	return uint64(res)
 }
 
+func (this *AutoIncrIdGen) Reset() bool {
+	oldVal := *this.id
+	swappedOk := atomic.CompareAndSwapInt64(this.id, oldVal, 0)
+	return swappedOk
+}
+
 func NewAutoIncrIdGen() AutoIncrIdGen {
 	zero := int64(0)
 	gen := AutoIncrIdGen{

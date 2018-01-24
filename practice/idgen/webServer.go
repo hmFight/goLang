@@ -19,6 +19,7 @@ func initConnMap() cmap.ConcurrentMap {
 func IdWebServer(listenTo string) {
 	http.HandleFunc("/id/snowflake", snowflake)
 	http.HandleFunc("/id/incr", incr)
+	http.HandleFunc("/id/incr/resetall", incrResetAll)
 	http.HandleFunc("/id/incr/reset", incrReset)
 	err := http.ListenAndServe(listenTo, nil)
 
@@ -28,6 +29,31 @@ func IdWebServer(listenTo string) {
 }
 
 func incrReset(writer http.ResponseWriter, request *http.Request) {
+	request.ParseForm()
+	paramKey, exist := request.Form["key"]
+	var key string
+	if !exist {
+		fmt.Fprint(writer, "no param [key]")
+	} else {
+		key = paramKey[0]
+		incrGen, existKey := concurrentMap.Get(key)
+		if existKey {
+			if gen, typeChange := incrGen.(AutoIncrIdGen); typeChange {
+				if gen.Reset() {
+					fmt.Fprint(writer, "ok")
+				} else {
+					fmt.Fprint(writer, "failed")
+				}
+			} else {
+				fmt.Fprint(writer, "error")
+			}
+		} else {
+			fmt.Fprint(writer, "key:"+key+" not exist!")
+		}
+	}
+}
+
+func incrResetAll(writer http.ResponseWriter, request *http.Request) {
 	concurrentMap = initConnMap()
 	fmt.Fprint(writer, "ok")
 }
