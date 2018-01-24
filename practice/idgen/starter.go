@@ -14,7 +14,6 @@ var apis string
 
 func init() {
 	flag.BoolVar(&version, "v", false, "version")
-	flag.BoolVar(&help, "help", false, "this help")
 	flag.IntVar(&port, "port", 7888, "server port,default 7888")
 
 	flag.StringVar(&apis, "apis", "",
@@ -22,7 +21,7 @@ func init() {
 	/id/incr`)
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, `hi,all you guys!
+		fmt.Fprintf(os.Stdout, `hi,all you guys!
 `)
 		flag.PrintDefaults()
 	}
@@ -38,11 +37,11 @@ func StartIdServer() {
 		fmt.Println("version:0.1.1")
 		return
 	}
-	listenTo := "127.0.0.1:" + strconv.Itoa(port)
+	listenTo := ":" + strconv.Itoa(port)
 	fmt.Println("listen:" + listenTo)
 	fmt.Println("api:")
 	fmt.Println("    /id/snowflake")
 	fmt.Println("    /id/incr")
 
-	//IdWebServer(listenTo)
+	IdWebServer(listenTo)
 }

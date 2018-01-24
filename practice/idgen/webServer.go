@@ -16,12 +16,10 @@ func initConnMap() cmap.ConcurrentMap {
 	return connMap
 }
 
-func IdWebServer(listenTo string, prepare chan bool) {
+func IdWebServer(listenTo string) {
 	http.HandleFunc("/id/snowflake", snowflake)
 	http.HandleFunc("/id/incr", incr)
-	go func() {
-		prepare <- true
-	}()
+	http.HandleFunc("/id/incr/reset", incrReset)
 	err := http.ListenAndServe(listenTo, nil)
 
 	if err != nil {
@@ -29,8 +27,18 @@ func IdWebServer(listenTo string, prepare chan bool) {
 	}
 
 }
+func incrReset(writer http.ResponseWriter, request *http.Request) {
+	concurrentMap = initConnMap()
+	fmt.Fprint(writer, "ok")
+}
+
 func incr(writer http.ResponseWriter, request *http.Request) {
 	request.ParseForm()
+	//fmt.Println("method:", request.Method) //获取请求的方法
+	//for k, v := range request.Form {
+	//	fmt.Print("key:", k, "; ")
+	//	fmt.Println("val:", strings.Join(v, ""))
+	//}
 	paramKey, exist := request.Form["key"]
 	var key string
 	//请求参数中是否有 key
@@ -49,6 +57,7 @@ func incr(writer http.ResponseWriter, request *http.Request) {
 }
 
 func snowflake(writer http.ResponseWriter, request *http.Request) {
+
 	id := snowflakeIdGen.GetId()
 	fmt.Fprint(writer, id)
 }

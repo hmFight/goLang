@@ -4,44 +4,43 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"testing"
 )
 
-func TestWebServerId(t *testing.T) {
-	prepare := make(chan bool)
-	go func() {
-		IdWebServer("localhost:7888", prepare)
-	}()
-	<-prepare
-	funcName(t)
+func TestWebServerId(a *testing.T) {
+	IdWebServer(":7888")
 }
 
 func TestWebServer(t *testing.T) {
-	IdWebServer("localhost:7888", make(chan bool))
-}
-func funcName(t *testing.T) {
-	defaultKeyId := httpGetBodyStr("localhost:7888/id/incr")
-	key1Id := httpGetBodyStr("localhost:7888/id/incr?key=key1")
-	if defaultKeyId != "1" {
-		t.Error("expect 1,actual:", defaultKeyId)
+	defaultKeyIdUrl := "http://localhost:7888/id/incr"
+	spKeyUrl := "http://localhost:7888/id/incr?key=key1"
+
+	resetResult := httpGetBodyStr("http://localhost:7888/id/incr/reset")
+	testHelper(t, "ok", resetResult, "resetResult")
+
+	for defaultKeyId, i := "", 1; i <= 100; i++ {
+		defaultKeyId = httpGetBodyStr(defaultKeyIdUrl)
+		testHelper(t, strconv.Itoa(i), defaultKeyId, "defaultKeyId")
 	}
-	if key1Id != "1" {
-		t.Error("expect 1,actual:", key1Id)
+
+	for spkeyId, i := "", 1; i <= 1000; i++ {
+		spkeyId = httpGetBodyStr(spKeyUrl)
+		testHelper(t, strconv.Itoa(i), spkeyId, "spkeyId")
 	}
-	helper(t, "1", defaultKeyId)
-	helper(t, "1", key1Id)
-	defaultKeyId = httpGetBodyStr("localhost:7888/id/incr")
-	helper(t, "2", defaultKeyId)
-	helper(t, "3", defaultKeyId)
+
+	resetResult = httpGetBodyStr("http://localhost:7888/id/incr/reset")
+	testHelper(t, "ok", resetResult, "resetResult")
+
 }
 
-func helper(t *testing.T, expect interface{}, actual interface{}) {
+func testHelper(t *testing.T, expect interface{}, actual interface{}, msg string) {
 	if expect != actual {
-		t.Error("expect:", expect, "actual:actual")
+		t.Error(msg, "expect:", expect, "actual:", actual)
 	}
 }
 func httpGetBodyStr(url string) string {
-	resp, err := http.Get("")
+	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Println("error")
 	}
@@ -57,7 +56,6 @@ func TestSnowflakeIdGen_GetId(t *testing.T) {
 		go func() {
 			id := generator.GetId()
 			fmt.Println(generator.idSequence, generator.lastTimeStamp)
-			//fmt.Println(generator.lastTimeStamp)
 			fmt.Println(id)
 		}()
 	}
