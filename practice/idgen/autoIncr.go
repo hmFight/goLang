@@ -11,23 +11,23 @@ type AutoIncrIdGen struct {
 	lock *sync.RWMutex
 }
 
-func (this *AutoIncrIdGen) GetId() uint64 {
+func (this *AutoIncrIdGen) GetId() int64 {
 	res := atomic.AddInt64(this.id, this.step)
-	return uint64(res)
+	return res
 }
 
 func (this *AutoIncrIdGen) Reset() bool {
-	oldVal := *this.id
+	oldVal := *(this.id)
 	swappedOk := atomic.CompareAndSwapInt64(this.id, oldVal, 0)
 	return swappedOk
 }
 
-func NewAutoIncrIdGen() AutoIncrIdGen {
+func NewAutoIncrIdGen() *AutoIncrIdGen {
 	zero := int64(0)
 	gen := AutoIncrIdGen{
 		id:   &zero,
 		step: 1,
 		lock: new(sync.RWMutex),
 	}
-	return gen
+	return &gen
 }

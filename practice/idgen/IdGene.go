@@ -1,5 +1,5 @@
 package idgen
 
 type IIdGenerator interface {
-	GetId() uint64
+	GetId() int64
 }

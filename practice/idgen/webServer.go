@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"strconv"
+
 	"github.com/orcaman/concurrent-map"
 )
 
@@ -34,22 +36,20 @@ func incrReset(writer http.ResponseWriter, request *http.Request) {
 	var key string
 	if !exist {
 		fmt.Fprint(writer, "no param [key]")
+	}
+	key = paramKey[0]
+	incrGen, existKey := concurrentMap.Get(key)
+	if !existKey {
+		fmt.Fprint(writer, "key:"+key+" not exist!")
+	}
+	gen, ok := incrGen.(*AutoIncrIdGen)
+	if !ok {
+		fmt.Fprint(writer, "error")
+	}
+	if gen.Reset() {
+		fmt.Fprint(writer, "ok")
 	} else {
-		key = paramKey[0]
-		incrGen, existKey := concurrentMap.Get(key)
-		if existKey {
-			if gen, typeChange := incrGen.(AutoIncrIdGen); typeChange {
-				if gen.Reset() {
-					fmt.Fprint(writer, "ok")
-				} else {
-					fmt.Fprint(writer, "failed")
-				}
-			} else {
-				fmt.Fprint(writer, "error")
-			}
-		} else {
-			fmt.Fprint(writer, "key:"+key+" not exist!")
-		}
+		fmt.Fprint(writer, "failed")
 	}
 }
 
@@ -60,23 +60,50 @@ func incrResetAll(writer http.ResponseWriter, request *http.Request) {
 
 func incr(writer http.ResponseWriter, request *http.Request) {
 	request.ParseForm()
-	paramKey, exist := request.Form["key"]
-	var key string
-	if !exist {
-		key = "default"
-	} else {
-		key = paramKey[0]
+	key := getParam(request, "key", "default")
+	num, err := strconv.Atoi(getParam(request, "num", "1"))
+	if err != nil {
+		fmt.Fprint(writer, "param [num] error!")
 	}
 	tarIncrGen, mapExistKey := concurrentMap.Get(key)
 	if !mapExistKey {
 		tarIncrGen = NewAutoIncrIdGen()
 		concurrentMap.Set(key, tarIncrGen)
 	}
-	gen := tarIncrGen.(AutoIncrIdGen)
-	fmt.Fprint(writer, gen.GetId())
+	idGen, ok := tarIncrGen.(IIdGenerator)
+	if !ok {
+		fmt.Fprint(writer, "unknown error!")
+	}
+	fmt.Fprint(writer, getIdRes(idGen, num))
+}
+
+//从http 表单中获取参数，如果不存在则返回默认
+func getParam(request *http.Request, key string, defVal string) string {
+	val, exist := request.Form[key]
+	if !exist {
+		return defVal
+	} else {
+		return val[0]
+	}
 }
 
 func snowflake(writer http.ResponseWriter, request *http.Request) {
-	id := snowflakeIdGen.GetId()
-	fmt.Fprint(writer, id)
+	request.ParseForm()
+	num, err := strconv.Atoi(getParam(request, "num", "1"))
+	if err != nil {
+		fmt.Fprint(writer, "param [num] error!")
+	}
+	fmt.Fprint(writer, getIdRes(snowflakeIdGen, num))
+}
+
+func getIdRes(generator IIdGenerator, num int) string {
+	var idResults string
+	for i := 0; i < num; i++ {
+		id := generator.GetId()
+		if i > 0 {
+			idResults += ","
+		}
+		idResults = idResults + strconv.FormatInt(id, 10)
+	}
+	return idResults
 }

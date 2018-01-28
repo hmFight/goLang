@@ -20,7 +20,7 @@ var timestampLeftShift = uint64(22)
 var sequenceMask = int64(4095)
 var baseTimestamp = int64(1516460341000)
 
-func NewIdGenerator(machineId, dataCenterId int64) SnowflakeIdGen {
+func NewIdGenerator(machineId, dataCenterId int64) *SnowflakeIdGen {
 	nowTimestamp := nowTimestamp()
 	generator := SnowflakeIdGen{
 		machineId:     machineId,
@@ -29,7 +29,7 @@ func NewIdGenerator(machineId, dataCenterId int64) SnowflakeIdGen {
 		lastTimeStamp: nowTimestamp,
 		lock:          new(sync.RWMutex),
 	}
-	return generator
+	return &generator
 }
 
 func nowTimestamp() int64 {
