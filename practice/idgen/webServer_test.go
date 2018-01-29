@@ -5,54 +5,73 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 	"testing"
 )
 
-func TestWebServerId(a *testing.T) {
-	IdWebServer(":7888")
+const incrApi = "http://localhost:7888/id/incr"
+const snowflakeApi = "http://localhost:7888/id/snowflake"
+const spKeyUrl = incrApi + "?key=key1"
+const resetAllUrl = incrApi + "/resetall"
+const resetUrl = incrApi + "/reset?key=key1"
+
+func TestBatchGetIncrId(t *testing.T) {
+	resetResult := httpGetBodyStr(resetAllUrl)
+	assertEquals(t, "ok", resetResult, "resetResult")
+
+	ids := httpGetBodyStr(incrApi + "?num=10")
+	idArr := strings.Split(ids, ",")
+
+	for index, id := range idArr {
+		assertEquals(t, strconv.Itoa(index+1), id, "id")
+	}
 }
 
-func TestStartIdServer(a *testing.T) {
-	StartIdServer()
+func TestBatchGetSnowflakeId(t *testing.T) {
+	resetResult := httpGetBodyStr(resetAllUrl)
+	assertEquals(t, "ok", resetResult, "resetResult")
+
+	ids := httpGetBodyStr(snowflakeApi + "?num=1000")
+	idArr := strings.Split(ids, ",")
+	assertEquals(t, 1000, len(idArr), "id size")
 }
 
 func TestWebServer(t *testing.T) {
-	defaultKeyIdUrl := "http://localhost:7888/id/incr"
-	spKeyUrl := "http://localhost:7888/id/incr?key=key1"
-
-	resetResult := httpGetBodyStr("http://localhost:7888/id/incr/resetall")
-	testHelper(t, "ok", resetResult, "resetResult")
+	resetResult := httpGetBodyStr(resetAllUrl)
+	assertEquals(t, "ok", resetResult, "resetResult")
 
 	for defaultKeyId, i := "", 1; i <= 100; i++ {
-		defaultKeyId = httpGetBodyStr(defaultKeyIdUrl)
-		testHelper(t, strconv.Itoa(i), defaultKeyId, "defaultKeyId")
+		defaultKeyId = httpGetBodyStr(incrApi)
+		assertEquals(t, strconv.Itoa(i), defaultKeyId, "defaultKeyId")
 	}
 
 	for spkeyId, i := "", 1; i <= 1000; i++ {
 		spkeyId = httpGetBodyStr(spKeyUrl)
-		testHelper(t, strconv.Itoa(i), spkeyId, "spkeyId")
+		assertEquals(t, strconv.Itoa(i), spkeyId, "spkeyId")
 	}
 
 	//test reset
-	resetResult = httpGetBodyStr("http://localhost:7888/id/incr/reset?key=key1")
-	testHelper(t, "ok", resetResult, "resetResult")
+	resetResult = httpGetBodyStr(resetUrl)
+	assertEquals(t, "ok", resetResult, "resetResult")
 
 	for spkeyId, i := "", 1; i <= 1000; i++ {
 		spkeyId = httpGetBodyStr(spKeyUrl)
-		testHelper(t, strconv.Itoa(i), spkeyId, "spkeyId")
+		assertEquals(t, strconv.Itoa(i), spkeyId, "spkeyId")
 	}
 
 }
 
-func testHelper(t *testing.T, expect interface{}, actual interface{}, msg string) {
+func assertEquals(t *testing.T, expect interface{}, actual interface{}, msg string) {
 	if expect != actual {
 		t.Error(msg, "expect:", expect, "actual:", actual)
 	}
 }
+
 func httpGetBodyStr(url string) string {
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Println("error")
+		return ""
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
@@ -60,14 +79,8 @@ func httpGetBodyStr(url string) string {
 }
 
 func TestSnowflakeIdGen_GetId(t *testing.T) {
-	stimestamp := nowTimestamp()
 	generator := NewIdGenerator(1, 1)
-	for i := 0; i <= 500; i++ {
-		go func() {
-			id := generator.GetId()
-			fmt.Println(generator.idSequence, generator.lastTimeStamp)
-			fmt.Println(id)
-		}()
-	}
-	fmt.Println("cost:", nowTimestamp()-stimestamp)
+	id := generator.GetId()
+	fmt.Println(generator.idSequence, generator.lastTimeStamp)
+	fmt.Println(id)
 }

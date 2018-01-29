@@ -30,6 +30,7 @@ func IdWebServer(listenTo string) {
 	}
 }
 
+//充值所有 自增id生成器 当前id
 func incrReset(writer http.ResponseWriter, request *http.Request) {
 	request.ParseForm()
 	paramKey, exist := request.Form["key"]
